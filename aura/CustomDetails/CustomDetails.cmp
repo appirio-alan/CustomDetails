@@ -1,0 +1,54 @@
+<!--
+ - Created by alan on 1/5/18.
+ -->
+
+<aura:component description="CustomDetails"
+                controller="CustomDetailsController"
+                implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForRecordHome">
+
+    <aura:attribute name="recordId"             type="Id" />
+    <aura:attribute name="sObjectName"          type="String" />
+    <aura:attribute name="layoutName"           type="String" />
+    <aura:attribute name="layout"               type="Object" />
+    <aura:attribute name="layoutIsValid"        type="Boolean" default="false" />
+    <aura:attribute name="ignoreSections"       type="String" default="" />
+    <aura:attribute name="ignoreSectionList"    type="String[]" />
+    <aura:attribute name="invalidLayoutMessage" type="String" default="You must specify a valid page layout in the settings"/>
+    <aura:attribute name="showInvalidMessage"   type="Boolean" default="true" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.layoutName}" action="{!c.doInit}" />
+
+    <aura:if isTrue="{! v.layoutIsValid }">
+        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="{!v.sObjectName}">
+            <aura:iteration var="section" items="{!v.layout.layoutSections}" indexVar="sectionNumber">
+                <c:Contains list="{!v.ignoreSectionList}" element="{!section.label}" compareType="exclude">
+                    <div class="slds-section slds-is-open">
+                        <h3 class="slds-section__title test-id__section-header-container">
+                            <lightning:button iconName="utility:chevrondown" iconPosition="left" class="slds-button test-id__section-header-button slds-section__title-action">
+                                <span class="slds-truncate" title="{! section.label }">{! section.label }</span>
+                            </lightning:button>
+                        </h3>
+                        <div aria-hidden="false" class="slds-section__content" id="{! 'section' + sectionNumber}">
+                            <div class="slds-grid">
+                                <aura:iteration var="column" items="{! section.layoutColumns }">
+                                    <div class="slds-col">
+                                        <aura:iteration var="item" items="{! column.layoutItems}">
+                                            <lightning:outputField fieldName="{!item.field}" variant="standard" />
+                                        </aura:iteration>
+                                    </div>
+                                </aura:iteration>
+                            </div>
+                        </div>
+                    </div>
+                </c:Contains>
+            </aura:iteration>
+        </lightning:recordViewForm>
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.showInvalidMessage}">
+                <h2>{! v.invalidLayoutMessage }</h2>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+
+</aura:component>

@@ -1,0 +1,23 @@
+<!--
+ - Created by alan on 1/5/18.
+ -->
+
+<design:component >
+
+    <design:attribute name="layoutName"
+                      label="Page Layout Name"
+                      description="Name of the page layout"/>
+
+    <design:attribute name="ignoreSections"
+                      label="Page Layout Sections to Ignore"
+                      description="Comma-delimited list of section names to ignore in the page layout" />
+
+    <design:attribute name="showInvalidMessage"
+                      label="Show Invalid Message"
+                      description="Select to display the invalid message" />
+
+    <design:attribute name="invalidLayoutMessage"
+                      label="Invalid Layout Message"
+                      description="Message to display if the specified layout is not valid" />
+
+</design:component>
