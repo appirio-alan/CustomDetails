@@ -1,54 +1,119 @@
 <!--
- - Created by alan on 1/5/18.
+ - Created by Alan Petersen on 1/5/18.
  -->
 
 <aura:component description="CustomDetails"
-                controller="CustomDetailsController"
-                implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForRecordHome">
+    controller="CustomDetailsController"
+    implements="force:hasRecordId,force:hasSObjectName,flexipage:availableForRecordHome">
 
     <aura:attribute name="recordId"             type="Id" />
     <aura:attribute name="sObjectName"          type="String" />
     <aura:attribute name="layoutName"           type="String" />
     <aura:attribute name="layout"               type="Object" />
     <aura:attribute name="layoutIsValid"        type="Boolean" default="false" />
-    <aura:attribute name="ignoreSections"       type="String" default="" />
+    <aura:attribute name="ignoreSections"       type="String"  default="" />
     <aura:attribute name="ignoreSectionList"    type="String[]" />
-    <aura:attribute name="invalidLayoutMessage" type="String" default="You must specify a valid page layout in the settings"/>
+    <aura:attribute name="invalidLayoutMessage" type="String"  default="You must specify a valid page layout in the settings" />
     <aura:attribute name="showInvalidMessage"   type="Boolean" default="true" />
+    <aura:attribute name="enableInlineEdit"     type="Boolean" default="true" />
+
+    <!--Edit Attributes -->
+    <aura:attribute name="isEditMode"           type="Boolean" default="false" />
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <aura:handler name="change" value="{!v.layoutName}" action="{!c.doInit}" />
 
     <aura:if isTrue="{! v.layoutIsValid }">
-        <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="{!v.sObjectName}">
-            <aura:iteration var="section" items="{!v.layout.layoutSections}" indexVar="sectionNumber">
-                <c:Contains list="{!v.ignoreSectionList}" element="{!section.label}" compareType="exclude">
-                    <div class="slds-section slds-is-open">
-                        <h3 class="slds-section__title test-id__section-header-container">
-                            <lightning:button iconName="utility:chevrondown" iconPosition="left" class="slds-button test-id__section-header-button slds-section__title-action">
-                                <span class="slds-truncate" title="{! section.label }">{! section.label }</span>
-                            </lightning:button>
-                        </h3>
-                        <div aria-hidden="false" class="slds-section__content" id="{! 'section' + sectionNumber}">
-                            <div class="slds-grid">
-                                <aura:iteration var="column" items="{! section.layoutColumns }">
-                                    <div class="slds-col">
-                                        <aura:iteration var="item" items="{! column.layoutItems}">
-                                            <lightning:outputField fieldName="{!item.field}" variant="standard" />
-                                        </aura:iteration>
-                                    </div>
-                                </aura:iteration>
+        <aura:if isTrue="{!v.isEditMode}">
+            <lightning:recordEditForm aura:id="editForm" recordId="{!v.recordId}" objectApiName="{!v.sObjectName}">
+                <aura:iteration var="section" items="{!v.layout.layoutSections}" indexVar="sectionNumber">
+                    <c:Contains list="{!v.ignoreSectionList}" element="{!section.label}" compareType="exclude">
+                        <div class="slds-section slds-is-open">
+                            <!-- only show the section header if it's not 'hidden' in the layout -->
+                            <aura:if isTrue="{! section.editHeading }">
+                                <h3 class="slds-section__title test-id__section-header-container">
+                                    <lightning:button iconName="utility:chevrondown"
+                                                      iconPosition="left"
+                                                      class="slds-button test-id__section-header-button slds-section__title-action">
+                                        <span class="slds-truncate" title="{! section.label }">{! section.label }</span>
+                                    </lightning:button>
+                                </h3>
+                            </aura:if>
+                            <div aria-hidden="false" class="slds-section__content" id="{! 'section' + sectionNumber}">
+                                <div class="slds-grid">
+                                    <aura:iteration var="column" items="{! section.layoutColumns }">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <aura:iteration var="item" items="{! column.layoutItems}">
+                                                <div style="width:90%">
+                                                    <aura:if isTrue="{!item.behavior == 'Readonly'}">
+                                                        <lightning:outputField fieldName="{!item.field}" variant="standard" />
+                                                        <aura:set attribute="else">
+                                                            <lightning:inputField fieldName="{!item.field}" />
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:iteration>
+                                </div>
                             </div>
                         </div>
+                    </c:Contains>
+                </aura:iteration>
+                <div class="footer active">
+                  <div class="slds-text-align_center forceRecordEditActions">
+                    <div class="actionsContainer">
+                            <lightning:button aura:id="cancel" type="cancel" label="Cancel" class="slds-m-top_medium" onclick="{!c.disableEditMode}" />
+                            <lightning:button aura:id="submit" type="submit" label="Save" variant="brand" class="slds-m-top_medium" onclick="{!c.submitForm}" />
+                        </div>
                     </div>
-                </c:Contains>
-            </aura:iteration>
-        </lightning:recordViewForm>
+                </div>
+            </lightning:recordEditForm>
         <aura:set attribute="else">
-            <aura:if isTrue="{!v.showInvalidMessage}">
-                <h2>{! v.invalidLayoutMessage }</h2>
-            </aura:if>
-        </aura:set>
+                <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="{!v.sObjectName}">
+                    <aura:iteration var="section" items="{!v.layout.layoutSections}"
+                        indexVar="sectionNumber">
+                        <c:Contains list="{!v.ignoreSectionList}" element="{!section.label}" compareType="exclude">
+                            <div class="slds-section slds-is-open">
+                                <!-- only show the section header if it's not 'hidden' in the layout -->
+                                <aura:if isTrue="{! section.detailHeading }">
+                                    <h3 class="slds-section__title test-id__section-header-container">
+                                        <lightning:button iconName="utility:chevrondown"
+                                            iconPosition="left"
+                                            class="slds-button test-id__section-header-button slds-section__title-action">
+                                            <span class="slds-truncate" title="{! section.label }">{! section.label }</span>
+                                        </lightning:button>
+                                    </h3>
+                                </aura:if>
+                                <div aria-hidden="false" class="slds-section__content" id="{! 'section' + sectionNumber}">
+                                    <div class="slds-grid">
+                                        <aura:iteration var="column" items="{! section.layoutColumns }">
+                                            <div class="{!'slds-col slds-size_1-of-' + section.layoutColumns.length}">
+                                                <aura:iteration var="item" items="{! column.layoutItems}">
+                                                    <div style="width: 90%;border-bottom: 1px solid rgb(221, 219, 218);display: inline-block;vertical-align: bottom;">
+                                                        <lightning:outputField fieldName="{!item.field}" variant="standard" />
+                                                    </div>
+                                                    <div style="display: inline-block;vertical-align: bottom;padding-bottom:5px;">
+                                                        <aura:if isTrue="{!v.enableInlineEdit &amp;&amp; item.behavior != 'Readonly'}">
+                                                            <lightning:buttonIcon iconName="utility:edit" size="small" variant="bare" onclick="{!c.enableEditMode}"/>
+                                                        </aura:if>
+                                                    </div>
+                                                </aura:iteration>
+                                            </div>
+                                        </aura:iteration>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:Contains>
+                    </aura:iteration>
+              </lightning:recordViewForm>
+            </aura:set>
     </aura:if>
+    <aura:set attribute="else">
+      <aura:if isTrue="{!v.showInvalidMessage}">
+        <h2>{! v.invalidLayoutMessage }</h2>
+      </aura:if>
+    </aura:set>
+  </aura:if>
 
 </aura:component>

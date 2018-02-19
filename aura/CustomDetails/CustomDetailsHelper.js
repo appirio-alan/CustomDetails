@@ -42,6 +42,19 @@
             ignoreStr = "";
         }
         component.set("v.ignoreSectionList", ignoreStr.split(','));
+    },
+
+    submitForm : function(component) {
+        this.disableEditMode(component);
+        component.find("editForm").submit();
+    },
+
+    enableEditMode : function(component) {
+        component.set("v.isEditMode", true);
+    },
+
+    disableEditMode : function(component) {
+        component.set("v.isEditMode", false);
     }
 
 })
