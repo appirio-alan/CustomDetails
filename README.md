@@ -7,8 +7,6 @@ The component can be used by placing the component in the desired location on th
 
 <img src="./images/CustomDetails_component.png" alt="Detail Page" style="width: 200px;"/>
 
-![](./images/CustomDetails_component.png | width=100)
-
 The detail in the sidebar of the Lightning App Builder allows you to specify data on how the component is used
 
 <img src="./images/CustomDetails_detail.png" alt="Detail Page" style="width: 200px;"/>
