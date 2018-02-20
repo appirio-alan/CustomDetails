@@ -18,11 +18,21 @@ The detail in the sidebar of the Lightning App Builder allows you to specify dat
 * **Invalid Layout Message** -- the message to display if the page layout cannot be found.
 
 ## Including in a Wrapper Component
-
+If you need a more complex use case (e.g. displaying related 
 
 ```
 <apex:component>
-	<c:CustomDetails />
+
+// code loading 'parent' component
+//
+
+	<c:CustomDetails 
+		sObjectName="SomeOtherObject__c" 
+		recordId="{!v.otherObject.Id}" 
+		layoutName="Special Layout"
+		ignoreSections="Details,Custom Links"
+		enableInlineEdit="true" />
+		
 </apex:component>
 ```
 
