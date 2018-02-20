@@ -9,7 +9,7 @@ The component can be used by placing the component in the desired location on th
 
 The detail in the sidebar of the Lightning App Builder allows you to specify data on how the component is used
 
-<img src="./images/CustomDetails_detail.png" alt="Detail Page" width="200" />
+<img src="./images/CustomDetails_detail.png" alt="Detail Page" width="300" />
 
 * **Page Layout Name** -- the name of the layout 
 * **Enable Inline Editing** -- checkbox to indicate whether or not inline editing (little pencils) should be enabled
